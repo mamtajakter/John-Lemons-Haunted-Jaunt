@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -12,11 +13,25 @@ public class PlayerMovement : MonoBehaviour
     Vector3 m_Movement;
     Quaternion m_Rotation = Quaternion.identity;
 
+    //dot
+    public Text alertText;
+    public Transform game1;
+    public float dotProduct;
+    public Vector3 playerPosNorm;
+    public Vector3 enemyPosNorm;
+
+    //lerp
+    public Transform fromPlayer;
+    public Transform toTarget;
+    public float fract;
+
     void Start ()
     {
         m_Animator = GetComponent<Animator> ();
         m_Rigidbody = GetComponent<Rigidbody> ();
         m_AudioSource = GetComponent<AudioSource> ();
+
+        alertText.text="";
     }
 
     void FixedUpdate ()
@@ -46,6 +61,27 @@ public class PlayerMovement : MonoBehaviour
 
         Vector3 desiredForward = Vector3.RotateTowards (transform.forward, m_Movement, turnSpeed * Time.deltaTime, 0f);
         m_Rotation = Quaternion.LookRotation (desiredForward);
+
+
+        // dot
+        playerPosNorm = gameObject.transform.position.normalized;
+        enemyPosNorm = game1.transform.position.normalized;
+        dotProduct = Vector3.Dot(playerPosNorm, enemyPosNorm);
+        if (dotProduct>0.99)
+        {
+            alertText.text = "Watch out!";
+        }
+        else
+        {
+            alertText.text = "";
+        }
+
+
+        // lerp
+        // transform.position = Vector3.Lerp(fromPlayer.position, toTarget.position,fract);
+        toTarget.localScale = Vector3.Lerp(toTarget.localScale, toTarget.localScale*2,fract);
+            
+        
     }
 
     void OnAnimatorMove ()
